@@ -293,7 +293,7 @@ public abstract class PlayerList {
         // depending on the outcome.
         EntityPlayer entity = new EntityPlayer(this.server, this.server.getWorldServer(0), s, this.server.M() ? new DemoPlayerInteractManager(this.server.getWorldServer(0)) : new PlayerInteractManager(this.server.getWorldServer(0)));
         Player player = entity.getBukkitEntity();
-        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, pendingconnection.getSocket().getInetAddress());
+        PlayerLoginEvent event = new PlayerLoginEvent(player, hostname, ((java.net.InetSocketAddress) pendingconnection.networkManager.getSocketAddress()).getAddress(), pendingconnection.getSocket().getInetAddress()); // Spigot
 
         SocketAddress socketaddress = pendingconnection.networkManager.getSocketAddress();
 
@@ -307,7 +307,7 @@ public abstract class PlayerList {
 
             event.disallow(PlayerLoginEvent.Result.KICK_BANNED, s1);
         } else if (!this.isWhitelisted(s)) {
-            event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, "You are not white-listed on this server!");
+            event.disallow(PlayerLoginEvent.Result.KICK_WHITELIST, org.spigotmc.SpigotConfig.whitelistMessage); // Spigot
         } else {
             String s2 = socketaddress.toString();
 
@@ -323,7 +323,7 @@ public abstract class PlayerList {
 
                 event.disallow(PlayerLoginEvent.Result.KICK_BANNED, s3);
             } else if (this.players.size() >= this.maxPlayers) {
-                event.disallow(PlayerLoginEvent.Result.KICK_FULL, "The server is full!");
+                event.disallow(PlayerLoginEvent.Result.KICK_FULL, org.spigotmc.SpigotConfig.serverFullMessage); // Spigot
             } else {
                 event.disallow(PlayerLoginEvent.Result.ALLOWED, s2);
             }
@@ -717,6 +717,25 @@ public abstract class PlayerList {
             this.sendAll(new Packet201PlayerInfo(entityplayer.name, true, entityplayer.ping));
         }
         // CraftBukkit end */
+        // Spigot start
+        if ( !players.isEmpty() )
+        {
+            int index = MinecraftServer.currentTick % this.players.size();
+            EntityPlayer player = (EntityPlayer) this.players.get( index );
+            if ( player.lastPing == -1 || Math.abs( player.ping - player.lastPing ) > 20 )
+            {
+                Packet packet = new Packet201PlayerInfo( player.listName, true, player.ping );
+                for ( EntityPlayer splayer : (List<EntityPlayer>) this.players )
+                {
+                    if ( splayer.getBukkitEntity().canSee( player.getBukkitEntity() ) )
+                    {
+                        splayer.playerConnection.sendPacket( packet );
+                    }
+                }
+                player.lastPing = player.ping;
+            }
+        }
+        // Spigot end
     }
 
     public void sendAll(Packet packet) {
@@ -1048,7 +1067,14 @@ public abstract class PlayerList {
 
     public void r() {
         while (!this.players.isEmpty()) {
-            ((EntityPlayer) this.players.get(0)).playerConnection.disconnect(this.server.server.getShutdownMessage()); // CraftBukkit - add custom shutdown message
+            // Spigot start
+            EntityPlayer p = (EntityPlayer) this.players.get( 0 );
+            p.playerConnection.disconnect( this.server.server.getShutdownMessage() );
+            if ( ( !this.players.isEmpty() ) && ( this.players.get( 0 ) == p ) )
+            {
+                this.players.remove( 0 ); // Prevent shutdown hang if already disconnected
+            }
+            // Spigot end
         }
     }
 

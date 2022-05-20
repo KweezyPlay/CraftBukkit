@@ -34,7 +34,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
         super(options);
         // CraftBukkit end
         this.l = new ConsoleLogManager("Minecraft-Server", (String) null, (String) null); // CraftBukkit - null last argument
-        new ThreadSleepForever(this);
+        // new ThreadSleepForever(this);
     }
 
     protected boolean init() throws java.net.UnknownHostException { // CraftBukkit - throws UnknownHostException
@@ -89,13 +89,22 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
         if (this.G() < 0) {
             this.setPort(this.propertyManager.getInt("server-port", 25565));
         }
+        // Spigot start
+        this.a((PlayerList) (new DedicatedPlayerList(this)));
+        org.spigotmc.SpigotConfig.init();
+        org.spigotmc.SpigotConfig.registerCommands();
+        // Spigot end
 
         this.getLogger().info("Generating keypair");
         this.a(MinecraftEncryption.b());
         this.getLogger().info("Starting Minecraft server on " + (this.getServerIp().length() == 0 ? "*" : this.getServerIp()) + ":" + this.G());
 
         try {
-            this.r = new DedicatedServerConnection(this, inetaddress, this.G());
+            // Spigot start
+            this.r = ( org.spigotmc.SpigotConfig.listeners.get( 0 ).netty )
+                    ? new org.spigotmc.netty.NettyServerConnection( this, inetaddress, this.G() )
+                    : new DedicatedServerConnection( this, inetaddress, this.G() );
+            // Spigot end
         } catch (Throwable ioexception) { // CraftBukkit - IOException -> Throwable
             this.getLogger().warning("**** FAILED TO BIND TO PORT!");
             this.getLogger().warning("The exception was: {0}", new Object[] { ioexception.toString()});
@@ -103,7 +112,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
             return false;
         }
 
-        this.a((PlayerList) (new DedicatedPlayerList(this))); // CraftBukkit
+        // this.a((PlayerList) (new DedicatedPlayerList(this))); // Spigot - Moved up
 
         if (!this.getOnlineMode()) {
             this.getLogger().warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");

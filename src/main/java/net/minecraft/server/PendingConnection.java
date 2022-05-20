@@ -17,7 +17,7 @@ public class PendingConnection extends Connection {
     private static Random random = new Random();
     private byte[] d;
     private final MinecraftServer server;
-    public final NetworkManager networkManager;
+    public final INetworkManager networkManager;
     public boolean b = false;
     private int f = 0;
     private String g = null;
@@ -27,10 +27,15 @@ public class PendingConnection extends Connection {
     private SecretKey k = null;
     public String hostname = ""; // CraftBukkit - add field
 
+    public PendingConnection(MinecraftServer minecraftserver, org.spigotmc.netty.NettyNetworkManager networkManager) {
+        this.server = minecraftserver;
+        this.networkManager = networkManager;
+    }
+
     public PendingConnection(MinecraftServer minecraftserver, Socket socket, String s) throws java.io.IOException { // CraftBukkit - throws IOException
         this.server = minecraftserver;
         this.networkManager = new NetworkManager(minecraftserver.getLogger(), socket, s, this, minecraftserver.F().getPrivate());
-        this.networkManager.e = 0;
+        // this.networkManager.e = 0;
     }
 
     // CraftBukkit start
@@ -100,7 +105,7 @@ public class PendingConnection extends Connection {
 
     public void a(Packet205ClientCommand packet205clientcommand) {
         if (packet205clientcommand.a == 0) {
-            if (this.server.getOnlineMode()) {
+            if (true) { // Spigot - Always fire
                 if (this.j) {
                     this.disconnect("Duplicate login");
                     return;
@@ -146,7 +151,7 @@ public class PendingConnection extends Connection {
             // CraftBukkit
             org.bukkit.event.server.ServerListPingEvent pingEvent = org.bukkit.craftbukkit.event.CraftEventFactory.callServerListPingEvent(this.server.server, getSocket().getInetAddress(), this.server.getMotd(), playerlist.getPlayerCount(), playerlist.getMaxPlayers());
 
-            if (packet254getinfo.a == 1) {
+            if (true) {
                 // CraftBukkit start - Fix decompile issues, don't create a list from an array
                 Object[] list = new Object[] { 1, 61, this.server.getVersion(), pingEvent.getMotd(), playerlist.getPlayerCount(), pingEvent.getMaxPlayers() };
 
@@ -173,9 +178,18 @@ public class PendingConnection extends Connection {
 
             this.networkManager.queue(new Packet255KickDisconnect(s));
             this.networkManager.d();
-            if (inetaddress != null && this.server.ae() instanceof DedicatedServerConnection) {
-                ((DedicatedServerConnection) this.server.ae()).a(inetaddress);
+            // Spigot start
+            if ( inetaddress != null )
+            {
+                if ( this.server.ae() instanceof DedicatedServerConnection )
+                {
+                    ((DedicatedServerConnection) this.server.ae()).a(inetaddress);
+                } else
+                {
+                    ((org.spigotmc.netty.NettyServerConnection)this.server.ae()).unThrottle( inetaddress );
+                }
             }
+            // Spigot end
 
             this.b = true;
         } catch (Exception exception) {
@@ -214,4 +228,17 @@ public class PendingConnection extends Connection {
     static boolean a(PendingConnection pendingconnection, boolean flag) {
         return pendingconnection.h = flag;
     }
+
+    // Spigot start
+    @Override
+    public void a(Packet250CustomPayload pcp) {
+        if (pcp.tag.equals("BungeeCord") && org.spigotmc.SpigotConfig.bungee && org.spigotmc.SpigotConfig.bungeeAddresses.contains(getSocket().getInetAddress().getHostAddress())) {
+            com.google.common.io.ByteArrayDataInput in = com.google.common.io.ByteStreams.newDataInput(pcp.data);
+            String subTag = in.readUTF();
+            if (subTag.equals("Login")) {
+                networkManager.setSocketAddress(new java.net.InetSocketAddress(in.readUTF(), in.readInt()));
+            }
+        }
+    }
+    // Spigot end
 }

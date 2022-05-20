@@ -846,7 +846,17 @@ public class PlayerConnection extends Connection {
                 this.chat(s, packet3chat.a_());
 
                 // This section stays because it is only applicable to packets
-                if (chatSpamField.addAndGet(this, 20) > 200 && !this.minecraftServer.getPlayerList().isOp(this.player.name)) { // CraftBukkit use thread-safe spam
+                // Spigot - spam exclusions
+                boolean counted = true;
+                for ( String exclude : org.spigotmc.SpigotConfig.spamExclusions )
+                {
+                    if ( s.startsWith( exclude ) )
+                    {
+                        counted = false;
+                        break;
+                    }
+                }
+                if (counted && chatSpamField.addAndGet(this, 20) > 200 && !this.minecraftServer.getPlayerList().isOp(this.player.name)) { // CraftBukkit use thread-safe spam
                     if (packet3chat.a_()) {
                         Waitable waitable = new Waitable() {
                             @Override
@@ -956,6 +966,7 @@ public class PlayerConnection extends Connection {
     // CraftBukkit end
 
     private void handleCommand(String s) {
+        org.bukkit.craftbukkit.SpigotTimings.playerCommandTimer.startTiming(); // Spigot
         // CraftBukkit start
         CraftPlayer player = this.getPlayer();
 
@@ -963,19 +974,28 @@ public class PlayerConnection extends Connection {
         this.server.getPluginManager().callEvent(event);
 
         if (event.isCancelled()) {
+            org.bukkit.craftbukkit.SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
             return;
         }
 
         try {
-            this.minecraftServer.getLogger().info(event.getPlayer().getName() + " issued server command: " + event.getMessage()); // CraftBukkit
+            // Spigot Start
+            if ( org.spigotmc.SpigotConfig.logCommands )
+            {
+                this.minecraftServer.getLogger().info(event.getPlayer().getName() + " issued server command: " + event.getMessage()); // CraftBukkit
+            }
+            // Spigot end
             if (this.server.dispatchCommand(event.getPlayer(), event.getMessage().substring(1))) {
+                org.bukkit.craftbukkit.SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
                 return;
             }
         } catch (org.bukkit.command.CommandException ex) {
             player.sendMessage(org.bukkit.ChatColor.RED + "An internal error occurred while attempting to perform this command");
             java.util.logging.Logger.getLogger(PlayerConnection.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            org.bukkit.craftbukkit.SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
             return;
         }
+        org.bukkit.craftbukkit.SpigotTimings.playerCommandTimer.stopTiming(); // Spigot
         // CraftBukkit end
 
         /* CraftBukkit start - No longer needed as we have already handled it in server.dispatchServerCommand above.
@@ -1071,6 +1091,13 @@ public class PlayerConnection extends Connection {
 
         WorldServer worldserver = this.minecraftServer.getWorldServer(this.player.dimension);
         Entity entity = worldserver.getEntity(packet7useentity.target);
+        // Spigot Start
+        if ( entity == player )
+        {
+            disconnect( "Cannot interact with self!" );
+            return;
+        }
+        // Spigot End
 
         if (entity != null) {
             boolean flag = this.player.n(entity);
@@ -1554,7 +1581,7 @@ public class PlayerConnection extends Connection {
                     flag = false;
                 } else {
                     for (i = 0; i < packet130updatesign.lines[j].length(); ++i) {
-                        if (SharedConstants.allowedCharacters.indexOf(packet130updatesign.lines[j].charAt(i)) < 0) {
+                        if (!SharedConstants.isAllowedChatCharacter(packet130updatesign.lines[j].charAt(i))) { // Spigot
                             flag = false;
                         }
                     }

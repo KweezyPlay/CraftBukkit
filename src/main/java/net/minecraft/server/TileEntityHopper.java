@@ -181,16 +181,19 @@ public class TileEntityHopper extends TileEntity implements IHopper {
                 boolean flag = this.u() | suckInItems(this);
 
                 if (flag) {
-                    this.c(8);
+                    this.c(world.spigotConfig.hopperTransfer); // Spigot
                     this.update();
                     return true;
                 }
             }
-
-            return false;
-        } else {
-            return false;
         }
+        // Spigot start
+        if ( this.c == 0 )
+        {
+            this.c( world.spigotConfig.hopperCheck );
+        }
+        // Spigot end
+        return false;
     }
 
     private boolean u() {
@@ -217,7 +220,7 @@ public class TileEntityHopper extends TileEntity implements IHopper {
                     this.getWorld().getServer().getPluginManager().callEvent(event);
                     if (event.isCancelled()) {
                         this.setItem(i, itemstack);
-                        this.c(8); // Delay hopper checks
+                        this.c(world.spigotConfig.hopperTransfer); // Spigot
                         return false;
                     }
                     ItemStack itemstack1 = addItem(iinventory, CraftItemStack.asNMSCopy(event.getItem()), Facing.OPPOSITE_FACING[BlockHopper.c(this.p())]);
@@ -298,9 +301,9 @@ public class TileEntityHopper extends TileEntity implements IHopper {
                 iinventory.setItem(i, itemstack1);
 
                 if (ihopper instanceof TileEntityHopper) {
-                    ((TileEntityHopper) ihopper).c(8); // Delay hopper checks
+                    ((TileEntityHopper) ihopper).c(ihopper.getWorld().spigotConfig.hopperTransfer); // Spigot
                 } else if (ihopper instanceof EntityMinecartHopper) {
-                    ((EntityMinecartHopper) ihopper).n(4); // Delay hopper minecart checks
+                    ((EntityMinecartHopper) ihopper).n(ihopper.getWorld().spigotConfig.hopperTransfer / 2); // Spigot
                 }
 
                 return false;
@@ -404,7 +407,7 @@ public class TileEntityHopper extends TileEntity implements IHopper {
 
             if (flag) {
                 if (iinventory instanceof TileEntityHopper) {
-                    ((TileEntityHopper) iinventory).c(8);
+                    ((TileEntityHopper) iinventory).c(((TileEntityHopper) iinventory).world.spigotConfig.hopperTransfer); // Spigot
                 }
 
                 iinventory.update();

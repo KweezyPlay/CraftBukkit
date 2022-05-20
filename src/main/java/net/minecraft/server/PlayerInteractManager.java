@@ -184,6 +184,7 @@ public class PlayerInteractManager {
                     this.o = j1;
                 }
             }
+            world.spigotConfig.antiXrayInstance.updateNearbyBlocks(world, i, j, k); // Spigot
         }
     }
 

@@ -149,6 +149,12 @@ public abstract class EntityMinecartContainer extends EntityMinecartAbstract imp
     }
 
     public void c(int i) {
+        // Spigot Start
+        for ( HumanEntity human : new java.util.ArrayList<HumanEntity>( transaction ) )
+        {
+            human.closeInventory();
+        }
+        // Spigot End
         this.b = false;
         super.c(i);
     }

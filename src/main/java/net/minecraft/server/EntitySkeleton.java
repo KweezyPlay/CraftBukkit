@@ -245,9 +245,21 @@ public class EntitySkeleton extends EntityMonster implements IRangedEntity {
         if (EnchantmentManager.getEnchantmentLevel(Enchantment.ARROW_FIRE.id, this.bG()) > 0 || this.getSkeletonType() == 1) {
             entityarrow.setOnFire(100);
         }
+        // Spigot -  Skeletons should throw EntityShootBowEvents
+        org.bukkit.event.entity.EntityShootBowEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callEntityShootBowEvent( this, this.bG(), entityarrow, 1.6F );
+        if ( event.isCancelled() )
+        {
+            event.getProjectile().remove();
+            return;
+        }
+        if ( event.getProjectile() == entityarrow.getBukkitEntity() )
+        {
+            this.world.addEntity( entityarrow );
+        }
+        // Spigot end
 
         this.makeSound("random.bow", 1.0F, 1.0F / (this.aE().nextFloat() * 0.4F + 0.8F));
-        this.world.addEntity(entityarrow);
+        // this.world.addEntity(entityarrow); // Spigot - moved up
     }
 
     public int getSkeletonType() {

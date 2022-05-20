@@ -240,6 +240,7 @@ public class Explosion {
                 j = chunkposition.y;
                 k = chunkposition.z;
                 l = this.world.getTypeId(i, j, k);
+                world.spigotConfig.antiXrayInstance.updateNearbyBlocks(world, i, j, k); // Spigot
                 if (flag) {
                     double d0 = (double) ((float) i + this.world.random.nextFloat());
                     double d1 = (double) ((float) j + this.world.random.nextFloat());

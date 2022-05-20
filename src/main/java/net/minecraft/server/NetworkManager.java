@@ -24,7 +24,7 @@ public class NetworkManager implements INetworkManager {
     private final Object h = new Object();
     private final IConsoleLogManager i;
     public Socket socket; // CraftBukkit - private -> public
-    private final SocketAddress k;
+    private SocketAddress k; // Spigot - remove final
     private volatile DataInputStream input;
     private volatile DataOutputStream output;
     private volatile boolean n = true;
@@ -369,4 +369,6 @@ public class NetworkManager implements INetworkManager {
     static Thread h(NetworkManager networkmanager) {
         return networkmanager.u;
     }
+
+    public void setSocketAddress(SocketAddress address) { k = address; } // Spigot
 }

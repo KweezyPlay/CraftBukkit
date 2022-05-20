@@ -37,6 +37,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.MobEffectList;
 import net.minecraft.server.PropertyManager;
 import net.minecraft.server.ServerCommand;
+import net.minecraft.server.RegionFile;
+import net.minecraft.server.RegionFileCache;
 import net.minecraft.server.ServerNBTManager;
 import net.minecraft.server.WorldLoaderServer;
 import net.minecraft.server.WorldManager;
@@ -208,7 +210,7 @@ public final class CraftServer implements Server {
         chunkGCLoadThresh = configuration.getInt("chunk-gc.load-threshold");
 
         updater = new AutoUpdater(new BukkitDLUpdaterService(configuration.getString("auto-updater.host")), getLogger(), configuration.getString("auto-updater.preferred-channel"));
-        updater.setEnabled(configuration.getBoolean("auto-updater.enabled"));
+        updater.setEnabled(false); // Spigot
         updater.setSuggestChannels(configuration.getBoolean("auto-updater.suggest-channels"));
         updater.getOnBroken().addAll(configuration.getStringList("auto-updater.on-broken"));
         updater.getOnUpdate().addAll(configuration.getStringList("auto-updater.on-update"));
@@ -524,7 +526,7 @@ public final class CraftServer implements Server {
             return true;
         }
 
-        sender.sendMessage("Unknown command. Type \"help\" for help.");
+        sender.sendMessage(org.spigotmc.SpigotConfig.unknownCommandMessage);
 
         return false;
     }
@@ -556,6 +558,7 @@ public final class CraftServer implements Server {
         playerList.getIPBans().load();
         playerList.getNameBans().load();
 
+        org.spigotmc.SpigotConfig.init(); // Spigot
         for (WorldServer world : console.worlds) {
             world.difficulty = difficulty;
             world.setSpawnFlags(monsters, animals);
@@ -570,11 +573,13 @@ public final class CraftServer implements Server {
             } else {
                 world.ticksPerMonsterSpawns = this.getTicksPerMonsterSpawns();
             }
+            world.spigotConfig.init(); // Spigot
         }
 
         pluginManager.clearPlugins();
         commandMap.clearCommands();
         resetRecipes();
+        org.spigotmc.SpigotConfig.registerCommands(); // Spigot
 
         int pollCount = 0;
 
@@ -807,6 +812,30 @@ public final class CraftServer implements Server {
 
         worlds.remove(world.getName().toLowerCase());
         console.worlds.remove(console.worlds.indexOf(handle));
+
+        File parentFolder = world.getWorldFolder().getAbsoluteFile();
+
+        // Synchronized because access to RegionFileCache.a is guarded by this lock.
+        synchronized (RegionFileCache.class) {
+            // RegionFileCache.a should be RegionFileCache.cache
+            Iterator<Map.Entry<File, RegionFile>> i = RegionFileCache.a.entrySet().iterator();
+            while(i.hasNext()) {
+                Map.Entry<File, RegionFile> entry = i.next();
+                File child = entry.getKey().getAbsoluteFile();
+                while (child != null) {
+                    if (child.equals(parentFolder)) {
+                        i.remove();
+                        try {
+                            entry.getValue().c(); // Should be RegionFile.close();
+                        } catch (IOException ex) {
+                            getLogger().log(Level.SEVERE, null, ex);
+                        }
+                        break;
+                    }
+                    child = child.getParentFile();
+                }
+            }
+        }
 
         return true;
     }
@@ -1059,7 +1088,7 @@ public final class CraftServer implements Server {
     }
 
     public OfflinePlayer getOfflinePlayer(String name) {
-        return getOfflinePlayer(name, true);
+        return getOfflinePlayer(name, false); // Spigot
     }
 
     public OfflinePlayer getOfflinePlayer(String name, boolean search) {
@@ -1326,7 +1355,7 @@ public final class CraftServer implements Server {
     public List<String> tabCompleteCommand(Player player, String message) {
         List<String> completions = null;
         try {
-            completions = getCommandMap().tabComplete(player, message.substring(1));
+            completions = (org.spigotmc.SpigotConfig.tabComplete) ? getCommandMap().tabComplete(player, message.substring(1)) : null;
         } catch (CommandException ex) {
             player.sendMessage(ChatColor.RED + "An internal error occurred while attempting to tab-complete this command");
             getLogger().log(Level.SEVERE, "Exception when " + player.getName() + " attempted to tab complete " + message, ex);

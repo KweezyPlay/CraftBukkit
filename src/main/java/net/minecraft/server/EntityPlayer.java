@@ -51,6 +51,7 @@ public class EntityPlayer extends EntityHuman implements ICrafting {
     public int newLevel = 0;
     public int newTotalExp = 0;
     public boolean keepLevel = false;
+    public int lastPing = -1; // Spigot
     // CraftBukkit end
 
     public EntityPlayer(MinecraftServer minecraftserver, World world, String s, PlayerInteractManager playerinteractmanager) {

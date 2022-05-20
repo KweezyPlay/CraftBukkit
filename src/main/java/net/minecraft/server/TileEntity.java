@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.spigotmc.CustomTimingsHandler; // Spigot
 import org.bukkit.inventory.InventoryHolder; // CraftBukkit
 
 public class TileEntity {
 
+    public CustomTimingsHandler tickTimer = org.bukkit.craftbukkit.SpigotTimings.getTileEntityTimings(this); // Spigot
     private static Map a = new HashMap();
     private static Map b = new HashMap();
     protected World world;

@@ -18,10 +18,23 @@ public class Packet51MapChunk extends Packet {
     public boolean e;
     private int size;
     private static byte[] buildBuffer = new byte[196864];
+    private static final byte[] unloadSequence = new byte[]{0x78, (byte) 0x9C, 0x63, 0x64, 0x1C, (byte) 0xD9, 0x00, 0x00, (byte) 0x81, (byte) 0x80, 0x01, 0x01}; // Spigot
 
     public Packet51MapChunk() {
         this.lowPriority = true;
     }
+
+    // Spigot start - add constructor for chunk removals for the client
+    public Packet51MapChunk(int x, int z) {
+        this.a = x;
+        this.b = z;
+        this.e = true;
+        this.c = 0;
+        this.d = 0;
+        this.size = unloadSequence.length;
+        this.buffer = unloadSequence;
+    }
+    // Spigot end
 
     public Packet51MapChunk(Chunk chunk, boolean flag, int i) {
         this.lowPriority = true;
@@ -29,10 +42,11 @@ public class Packet51MapChunk extends Packet {
         this.b = chunk.z;
         this.e = flag;
         ChunkMap chunkmap = a(chunk, flag, i);
-        Deflater deflater = new Deflater(-1);
+        Deflater deflater = new Deflater(4); // Spigot 4 -> -1
 
         this.d = chunkmap.c;
         this.c = chunkmap.b;
+        chunk.world.spigotConfig.antiXrayInstance.obfuscateSync(chunk.x, chunk.z, i, chunkmap.a, chunk.world); // Spigot
 
         try {
             this.inflatedBuffer = chunkmap.a;
@@ -139,16 +153,22 @@ public class Packet51MapChunk extends Packet {
         for (l = 0; l < achunksection.length; ++l) {
             if (achunksection[l] != null && (!flag || !achunksection[l].isEmpty()) && (i & 1 << l) != 0) {
                 nibblearray = achunksection[l].getDataArray();
-                System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                j += nibblearray.a.length;
+                // Spigot start
+                // System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                // j += nibblearray.a.length;
+                j = nibblearray.copyToByteArray(abyte, j);
+                // Spigot end
             }
         }
 
         for (l = 0; l < achunksection.length; ++l) {
             if (achunksection[l] != null && (!flag || !achunksection[l].isEmpty()) && (i & 1 << l) != 0) {
                 nibblearray = achunksection[l].getEmittedLightArray();
-                System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                j += nibblearray.a.length;
+                // Spigot start
+                // System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                // j += nibblearray.a.length;
+                j = nibblearray.copyToByteArray(abyte, j);
+                // Spigot end
             }
         }
 
@@ -156,8 +176,11 @@ public class Packet51MapChunk extends Packet {
             for (l = 0; l < achunksection.length; ++l) {
                 if (achunksection[l] != null && (!flag || !achunksection[l].isEmpty()) && (i & 1 << l) != 0) {
                     nibblearray = achunksection[l].getSkyLightArray();
-                    System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                    j += nibblearray.a.length;
+                    // Spigot start
+                    // System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                    // j += nibblearray.a.length;
+                    j = nibblearray.copyToByteArray(abyte, j);
+                    // Spigot end
                 }
             }
         }
@@ -166,8 +189,11 @@ public class Packet51MapChunk extends Packet {
             for (l = 0; l < achunksection.length; ++l) {
                 if (achunksection[l] != null && (!flag || !achunksection[l].isEmpty()) && achunksection[l].getExtendedIdArray() != null && (i & 1 << l) != 0) {
                     nibblearray = achunksection[l].getExtendedIdArray();
-                    System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
-                    j += nibblearray.a.length;
+                    // Spigot start
+                    //System.arraycopy(nibblearray.a, 0, abyte, j, nibblearray.a.length);
+                    //j += nibblearray.a.length;
+                    j = nibblearray.copyToByteArray(abyte, j);
+                    // Spigot end
                 }
             }
         }

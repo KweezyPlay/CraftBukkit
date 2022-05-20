@@ -94,6 +94,7 @@ public class EntityFallingBlock extends Entity {
                     }
 
                     this.world.setAir(i, j, k);
+                    world.spigotConfig.antiXrayInstance.updateNearbyBlocks(world, i, j, k); // Spigot
                 }
 
                 if (this.onGround) {

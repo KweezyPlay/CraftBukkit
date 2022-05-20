@@ -52,7 +52,7 @@ class PlayerChunk {
 
     public void b(EntityPlayer entityplayer) {
         if (this.b.contains(entityplayer)) {
-            entityplayer.playerConnection.sendPacket(new Packet51MapChunk(PlayerChunkMap.a(this.playerChunkMap).getChunkAt(this.location.x, this.location.z), true, 0));
+            entityplayer.playerConnection.sendPacket(new Packet51MapChunk(this.location.x, this.location.z)); // Spigot - remove chunk load call just to unload in favour of specialized constructor
             this.b.remove(entityplayer);
             entityplayer.chunkCoordIntPairQueue.remove(this.location);
             if (this.b.isEmpty()) {

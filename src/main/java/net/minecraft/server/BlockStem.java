@@ -27,7 +27,7 @@ public class BlockStem extends BlockFlower {
         if (world.getLightLevel(i, j + 1, k) >= 9) {
             float f = this.m(world, i, j, k);
 
-            if (random.nextInt((int) (25.0F / f) + 1) == 0) {
+            if (random.nextInt((int) (world.growthOdds / (this.id == Block.PUMPKIN_STEM.id ? world.spigotConfig.pumpkinModifier : world.spigotConfig.melonModifier) * (25.0F / f)) + 1) == 0) { // Spigot
                 int l = world.getData(i, j, k);
 
                 if (l < 7) {

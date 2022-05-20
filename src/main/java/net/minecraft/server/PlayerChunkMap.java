@@ -22,7 +22,7 @@ public class PlayerChunkMap {
     public PlayerChunkMap(WorldServer worldserver, int i) {
         if (i > 15) {
             throw new IllegalArgumentException("Too big view radius!");
-        } else if (i < 3) {
+        } else if (i < 1) {
             throw new IllegalArgumentException("Too small view radius!");
         } else {
             this.e = i;
