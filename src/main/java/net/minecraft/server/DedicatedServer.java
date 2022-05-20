@@ -58,7 +58,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
         if (this.I()) {
             this.d("127.0.0.1");
         } else {
-            this.setOnlineMode(this.propertyManager.getBoolean("online-mode", true));
+            this.setOnlineMode(this.propertyManager.getBoolean("online-mode", false));
             this.d(this.propertyManager.getString("server-ip", ""));
         }
 
@@ -115,10 +115,8 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
         // this.a((PlayerList) (new DedicatedPlayerList(this))); // Spigot - Moved up
 
         if (!this.getOnlineMode()) {
-            this.getLogger().warning("**** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!");
-            this.getLogger().warning("The server will make no attempt to authenticate usernames. Beware.");
-            this.getLogger().warning("While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.");
-            this.getLogger().warning("To change this, set \"online-mode\" to \"true\" in the server.properties file.");
+            this.getLogger().warning("=====\n\n\nSERVER IS RUNNING IN OFFLINE/INSECURE MODE!\n\n\n=====");
+
         }
 
         // this.a((PlayerList) (new DedicatedPlayerList(this))); // CraftBukkit - moved up

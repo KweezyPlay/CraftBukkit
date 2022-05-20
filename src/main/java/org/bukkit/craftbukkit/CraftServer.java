@@ -178,7 +178,7 @@ public final class CraftServer implements Server {
         this.console = console;
         this.playerList = (DedicatedPlayerList) playerList;
         this.serverVersion = CraftServer.class.getPackage().getImplementationVersion();
-        online.value = console.getPropertyManager().getBoolean("online-mode", true);
+        online.value = console.getPropertyManager().getBoolean("online-mode", false);
 
         Bukkit.setServer(this);
 
@@ -1353,6 +1353,10 @@ public final class CraftServer implements Server {
     }
 
     public List<String> tabCompleteCommand(Player player, String message) {
+        if (message.equals("/")) {
+            return ImmutableList.<String>of();
+        }
+
         List<String> completions = null;
         try {
             completions = (org.spigotmc.SpigotConfig.tabComplete) ? getCommandMap().tabComplete(player, message.substring(1)) : null;
