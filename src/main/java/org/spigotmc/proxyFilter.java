@@ -16,25 +16,14 @@ public class proxyFilter
         {
             try
             {
-                InetAddress address = con.getSocket().getInetAddress();
-                String ip = address.getHostAddress();
+                // TODO: PROXY FILTER
 
-                if ( !address.isLoopbackAddress() )
-                {
-                    String[] split = ip.split( "\\." );
-                    StringBuilder lookup = new StringBuilder();
-                    for ( int i = split.length - 1; i >= 0; i-- )
+                    if ( false )
                     {
-                        lookup.append( split[i] );
-                        lookup.append( "." );
-                    }
-                    lookup.append( "xbl.spamhaus.org." );
-                    if ( InetAddress.getByName( lookup.toString() ) != null )
-                    {
-                        con.disconnect( "Your IP address (" + ip + ") is flagged as unsafe by spamhaus.org/xbl" );
+                        con.disconnect( "Your IP address (" + 1 + ") is flagged as unsafe by spamhaus.org/xbl" );
                         return true;
                     }
-                }
+
             } catch ( Exception ex )
             {
             }

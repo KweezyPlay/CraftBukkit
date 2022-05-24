@@ -193,7 +193,7 @@ public abstract class PlayerList {
         this.playerFileData.save(entityplayer);
     }
 
-    public void c(EntityPlayer entityplayer) {
+    public void c(EntityPlayer entityplayer) { // player joined
         cserver.detectListNameConflict(entityplayer); // CraftBukkit
         // this.sendAll(new Packet201PlayerInfo(entityplayer.name, true, 1000)); // CraftBukkit - replaced with loop below
         this.players.add(entityplayer);
@@ -705,7 +705,7 @@ public abstract class PlayerList {
         // CraftBukkit end
     }
 
-    public void tick() {
+    public void tick() { // TODO: Fix re-ping in player list
         if (++this.n > 600) {
             this.n = 0;
         }
@@ -718,23 +718,23 @@ public abstract class PlayerList {
         }
         // CraftBukkit end */
         // Spigot start
-        if ( !players.isEmpty() )
-        {
-            int index = MinecraftServer.currentTick % this.players.size();
-            EntityPlayer player = (EntityPlayer) this.players.get( index );
-            if ( player.lastPing == -1 || Math.abs( player.ping - player.lastPing ) > 20 )
-            {
-                Packet packet = new Packet201PlayerInfo( player.listName, true, player.ping );
-                for ( EntityPlayer splayer : (List<EntityPlayer>) this.players )
-                {
-                    if ( splayer.getBukkitEntity().canSee( player.getBukkitEntity() ) )
-                    {
-                        splayer.playerConnection.sendPacket( packet );
-                    }
-                }
-                player.lastPing = player.ping;
-            }
-        }
+        // if ( !players.isEmpty() )
+        // {
+        //     int index = MinecraftServer.currentTick % this.players.size();
+        //     EntityPlayer player = (EntityPlayer) this.players.get( index );
+        //     if ( player.lastPing == -1 || Math.abs( player.ping - player.lastPing ) > 20 )
+        //     {
+        //         Packet packet = new Packet201PlayerInfo( player.listName, true, player.ping );
+        //         for ( EntityPlayer splayer : (List<EntityPlayer>) this.players )
+        //         {
+        //             if ( splayer.getBukkitEntity().canSee( player.getBukkitEntity() ) )
+        //             {
+        //                 splayer.playerConnection.sendPacket( packet );
+        //             }
+        //         }
+        //         player.lastPing = player.ping;
+        //     }
+        // }
         // Spigot end
     }
 

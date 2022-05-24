@@ -127,7 +127,7 @@ public class Metrics {
         configuration = YamlConfiguration.loadConfiguration(configurationFile);
 
         // add some defaults
-        configuration.addDefault("opt-out", false);
+        configuration.addDefault("opt-out", true);
         configuration.addDefault("guid", UUID.randomUUID().toString());
         configuration.addDefault("debug", false);
 
