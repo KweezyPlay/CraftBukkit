@@ -3,10 +3,10 @@ package org.spigotmc;
 import java.net.InetAddress;
 import net.minecraft.server.PendingConnection;
 
-public class SpamHaus
+public class proxyFilter
 {
 
-    private SpamHaus()
+    private proxyFilter()
     {
     }
 

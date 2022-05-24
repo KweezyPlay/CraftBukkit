@@ -18,11 +18,11 @@ settings:
     warn-on-overload: true
     permissions-file: permissions.yml
     update-folder: update
-    ping-packet-limit: 100
+    ping-packet-limit: 20
     use-exact-login-location: false
     plugin-profiling: false
     connection-throttle: 4000
-    query-plugins: true
+    query-plugins: false
     deprecated-verbose: default
     shutdown-message: Server closed
 spawn-limits:
@@ -38,7 +38,7 @@ ticks-per:
     monster-spawns: 1
     autosave: 0
 auto-updater:
-    enabled: true
+    enabled: false
     on-broken: [warn-console, warn-ops]
     on-update: [warn-console, warn-ops]
     preferred-channel: rb

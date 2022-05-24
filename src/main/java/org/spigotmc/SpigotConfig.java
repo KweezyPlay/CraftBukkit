@@ -240,7 +240,7 @@ public class SpigotConfig
     public static boolean tabComplete;
     private static void tabComplete()
     {
-        tabComplete = getBoolean( "commands.tab-complete", true );
+        tabComplete = getBoolean( "commands.tab-complete", false );
     }
 
     public static String whitelistMessage;

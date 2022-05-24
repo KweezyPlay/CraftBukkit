@@ -11,6 +11,7 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.util.Waitable;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerPreLoginEvent;
+import org.spigotmc.proxyFilter;
 // CraftBukkit end
 
 class ThreadLoginVerifier extends Thread {
@@ -48,7 +49,7 @@ class ThreadLoginVerifier extends Thread {
 
     public void run() {
         try {
-            if (org.spigotmc.SpamHaus.filterIp(pendingConnection)) return; // Spigot
+            if (proxyFilter.filterIp(pendingConnection)) return; // Spigot
             if (server.getOnlineMode() && !auth()) return; // Spigot
 
             AsyncPlayerPreLoginEvent asyncEvent = new AsyncPlayerPreLoginEvent(PendingConnection.d(this.pendingConnection), ((java.net.InetSocketAddress) this.pendingConnection.networkManager.getSocketAddress()).getAddress()); // Spigot
