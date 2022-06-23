@@ -164,6 +164,7 @@ public final class CraftServer implements Server {
     private WarningState warningState = WarningState.DEFAULT;
     private final BooleanWrapper online = new BooleanWrapper();
     public CraftScoreboardManager scoreboardManager;
+    public String AuthServer;
 
     private final class BooleanWrapper {
         private boolean value = true;
@@ -179,6 +180,9 @@ public final class CraftServer implements Server {
         this.playerList = (DedicatedPlayerList) playerList;
         this.serverVersion = CraftServer.class.getPackage().getImplementationVersion();
         online.value = console.getPropertyManager().getBoolean("online-mode", false);
+        AuthServer = console.getPropertyManager().getString("authserver", "session.minecraft.net");
+        if (AuthServer.equals("")) { AuthServer = "session.minecraft.net"; }
+        getLogger().info("Using AuthServer: " + AuthServer);
 
         Bukkit.setServer(this);
 
@@ -1318,6 +1322,8 @@ public final class CraftServer implements Server {
     public int getAnimalSpawnLimit() {
         return animalSpawn;
     }
+
+    public String getAuthServer() { return AuthServer; }
 
     public int getWaterAnimalSpawnLimit() {
         return waterAnimalSpawn;

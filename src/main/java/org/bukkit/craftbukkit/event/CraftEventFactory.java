@@ -703,8 +703,8 @@ public class CraftEventFactory {
 
         // If they've got the same item in their hand, it'll need to be updated.
         if (itemInHand.id == Item.BOOK_AND_QUILL.id) {
-            if (!editBookEvent.isCancelled()) {
-                CraftItemStack.setItemMeta(itemInHand, editBookEvent.getNewBookMeta());
+            if (!editBookEvent.isCancelled() && !editBookEvent.getNewBookMeta().hasEnchants()) {
+                CraftItemStack.setItemMeta(itemInHand, editBookEvent.getNewBookMeta()); // TODO: Fix book's NBT
                 if (editBookEvent.isSigning()) {
                     itemInHand.id = Item.WRITTEN_BOOK.id;
                 }

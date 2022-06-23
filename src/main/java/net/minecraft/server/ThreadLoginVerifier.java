@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 // CraftBukkit start
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.util.Waitable;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -30,7 +31,7 @@ class ThreadLoginVerifier extends Thread {
 
     private boolean auth() throws java.io.IOException {
         String s = (new BigInteger(MinecraftEncryption.a(PendingConnection.a(this.pendingConnection), PendingConnection.b(this.pendingConnection).F().getPublic(), PendingConnection.c(this.pendingConnection)))).toString(16);
-        URL url = new URL("http://session.minecraft.net/game/checkserver.jsp?user=" + URLEncoder.encode(PendingConnection.d(this.pendingConnection), "UTF-8") + "&serverId=" + URLEncoder.encode(s, "UTF-8"));
+        URL url = new URL("http://" + Bukkit.getAuthServer() + "/game/checkserver.jsp?user=" + URLEncoder.encode(PendingConnection.d(this.pendingConnection), "UTF-8") + "&serverId=" + URLEncoder.encode(s, "UTF-8"));
         BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(url.openStream()));
         String s1 = bufferedreader.readLine();
 

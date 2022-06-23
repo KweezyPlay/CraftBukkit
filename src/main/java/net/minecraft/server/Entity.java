@@ -1772,6 +1772,9 @@ public abstract class Entity {
                 return;
             }
             exit = event.useTravelAgent() ? event.getPortalTravelAgent().findOrCreate(event.getTo()) : event.getTo();
+            if (exit == null) {
+                return;
+            }
             this.teleportTo(exit, true);
         }
     }

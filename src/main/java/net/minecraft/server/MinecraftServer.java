@@ -255,11 +255,13 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
         this.c("menu.generatingTerrain");
         byte b0 = 0;
 
+        Boolean keepspawninmemory = getPropertyManager().getBoolean("keepspawninmemory", true);
+
         // CraftBukkit start
         for (int j = 0; j < this.worlds.size(); ++j) {
             WorldServer worldserver = this.worlds.get(j);
             this.getLogger().info("Preparing start region for level " + j + " (Seed: " + worldserver.getSeed() + ")");
-            if (!worldserver.getWorld().getKeepSpawnInMemory()) {
+            if (!worldserver.getWorld().getKeepSpawnInMemory() || !keepspawninmemory) {
                 continue;
             }
 
